@@ -1,52 +1,60 @@
-# Subtype-Specific Imaging-Genomic Circuits — Reproducibility Notebook
+# Subtype-Specific Imaging-Gene Associations and Pathologic Complete Response in Breast Cancer: Reproducibility Repository
 
 ## What this is
-This repository contains the annotated Jupyter notebook (`Reproducibility_Notebook.ipynb`) documenting the full computational pipeline behind:
+This repository contains the code, outputs, and annotated notebook behind:
 
-> *Subtype-Specific Imaging-to-Gene Circuits Predicting Pathologic Complete Response in Breast Cancer: A Longitudinal DCE-MRI, Radiogenomic, and Mediation-Based Analysis*
+> *Subtype-Specific Imaging–Gene Associations and Pathologic Complete Response in Breast Cancer: A Longitudinal DCE-MRI, Radiogenomic, and Exploratory Mediation Analysis*
 > Suhas Chinta, Keller Collegiate Academy
 
-The notebook walks through every stage of the pipeline in order — data loading, IVIM extraction, the primary predictive model, SHAP interpretability, RFECV, GSEA pathway enrichment, radiogenomics, external validation across three independent GEO cohorts, mediation analysis, and the final significance lock — with the real code from each underlying script alongside a plain-language explanation of what it does and why, plus the exact locked result it produces.
-
-All numbers in the notebook are checked against the final paper and match it as the golden source.
-
-## How to read (and run) this repository
-The notebook is a **reproducibility artifact, not a packaged pipeline**. Code cells are real excerpts from the project's original analysis scripts, included so a reader can see exactly how each locked result was produced — not a single script meant to be run top-to-bottom.
-
-Running the notebook end-to-end will raise errors on several cells by design: some reference raw data files (patient-level DICOM series, `datawith4visits.csv`, `clinical_data.csv`, GEO series-matrix files) that are not included in this repository, for the size and data-use reasons described below. This is expected. Each cell is self-contained and documented well enough to be understood, checked, and adapted on its own, given access to the source data.
+Version 2.0.0 accompanies the revised version of the manuscript. It replaces version 1.0.0, which accompanied the original version under the earlier title "Subtype-Specific Imaging-to-Gene Circuits Predicting Pathologic Complete Response in Breast Cancer."
 
 ## Repository structure
 ```
 .
-├── README.md                      -- this file
-├── LICENSE                        -- MIT license
-├── requirements.txt                -- Python environment used for the analysis
-└── Reproducibility_Notebook.ipynb  -- annotated pipeline walkthrough
+|-- README.md                       this file
+|-- LICENSE                         MIT license
+|-- requirements.txt                Python environment for the version 2 analyses
+|-- Reproducibility_Notebook.ipynb  annotated record of the version 1 pipeline, with a
+|                                   "Version 2 status" note in every section
+`-- revision_v2/
+    |-- README.md                   run order, settings, seeds, and file descriptions
+    |-- code/                       all version 2 analysis scripts
+    |-- data/                       ESTIMATE gene signatures (the only bundled input)
+    `-- results/                    all version 2 outputs, including fold assignments,
+                                    patient-level predictions, the GSE20194
+                                    de-duplication map, per-cohort sample identifiers,
+                                    permutation null distributions, and figures
 ```
 
+## Where to start
+The authoritative results for the revised manuscript are produced by the scripts in `revision_v2/code/` and saved in `revision_v2/results/`. `revision_v2/README.md` lists the run order, the random seeds, the cross-validation settings, and what each output file contains. The notebook remains as a readable walkthrough of the version 1 pipeline; each section states whether its result was verified, corrected, superseded, or withdrawn in version 2, and Section 14 reports the version 2 results.
+
+## Main corrections in version 2
+- One version 1 run read a copy of the imaging file in which one patient's identifier was corrupted, which dropped that patient (383 instead of 384). All model results were recomputed on the verified 384-patient data.
+- External validation now uses clinical receptor status in every cohort and removes the 187 GSE20194 patients duplicated in GSE25066. Only SCUBE2 replicates.
+- Mediation was reformulated in temporal order (pretreatment gene, later imaging feature, pCR) with covariates and a tumor-purity adjustment, and is reported as exploratory.
+- Feature selection and threshold tuning now run inside the training folds only.
+- The IVIM diffusion analysis, the GDSC cell-line correlation, the 8-feature minimal panel, and the claim that MRI outperformed MammaPrint were withdrawn. The reasons are given in the notebook and in the revised manuscript.
+
 ## Requirements
-The analysis was run locally in VS Code on Python 3.11.9. Install dependencies with:
+Version 2 analyses were run on Python 3.10.12. Install dependencies with:
 ```
 pip install -r requirements.txt
 ```
-See `requirements.txt` for the specific library versions used, including `gseapy==1.3.0` (version-pinned because pathway-name column handling changed across `gseapy` releases; see notebook §6 for the specific fix this required).
+The version 1 analyses were run on Python 3.11.9 with the libraries named in the notebook. GSEA output was produced in version 1 with `gseapy==1.3.0` and is reused in version 2.
 
 ## Data
 This project uses only public, de-identified research data:
 
-- **I-SPY2 / ACRIN-6698** (imaging), via [The Cancer Imaging Archive (TCIA)](https://www.cancerimagingarchive.net/)
-- **GSE194040** (pretreatment gene expression, discovery cohort), via [GEO](https://www.ncbi.nlm.nih.gov/geo/)
+- **I-SPY2 / ACRIN-6698** imaging features and clinical data, via [The Cancer Imaging Archive (TCIA)](https://www.cancerimagingarchive.net/)
+- **GSE194040** (pretreatment gene expression), via [GEO](https://www.ncbi.nlm.nih.gov/geo/)
 - **GSE25066, GSE20194, GSE32646** (external validation cohorts), via GEO
-- **GDSC2 drug-sensitivity data** (SCUBE2/ERBB2/GRB7 vs. paclitaxel, ERBB2 vs. lapatinib), queried via the [Sanger DepMap Miner](https://depmap.sanger.ac.uk/) FlexiScatter tool (RNASeq expression vs. ln(IC50)), an 80-model breast carcinoma selection — this is a manual, interactive-portal query rather than a bulk file download, and is not independently scriptable with the tools used elsewhere in this pipeline
-- **DepMap CRISPR (Chronos effect scores) and PRISM Repurposing (drug viability)**, via bulk file download from the [DepMap Portal](https://depmap.org/portal/): `CRISPRGeneEffect.csv`/`Model.csv` (main quarterly release) and `primary-screen-replicate-collapsed-logfold-change.csv` plus companion files (separate PRISM Repurposing dataset section)
+- **DepMap PRISM Repurposing** (drug viability) and expression data, via the [DepMap Portal](https://depmap.org/portal/)
 
-Raw data files are not included in this repository due to size and data-use terms; the accession numbers and portal links above are sufficient to obtain them independently under each source's own access terms. Note that the GDSC2/DepMap Miner correlation specifically requires a manual portal query (FlexiScatter is an interactive web tool, not a queryable API) — it is not reproducible via a standalone script the way the DepMap/PRISM bulk-file analysis is. Processing and QC steps (including known parsing bugs and their fixes) are documented in full inside the notebook.
+Raw data files are not included because of size and data-use terms; the accession numbers above are sufficient to obtain them. `revision_v2/README.md` lists the exact file names each script expects.
 
-## Status of analysis
-All computational work is complete and locked, matching the final paper exactly. Wet-lab validation (SCUBE2 knockdown + paclitaxel sensitivity assay) was not performed as part of this study; it is proposed in the paper's Conclusion as a natural next step for functional follow-up, not as an open or pending result (see notebook §12).
-
-## Reproducibility note
-Code cells reflect the actual scripts used to generate each locked result. Where a script name is referenced but the original file was not separately preserved, this is stated explicitly in that cell rather than reconstructed silently. Every numeric result in the notebook is cross-checked against the paper as the single source of truth; any place where an earlier or superseded analysis run produced a different number is noted explicitly as superseded, rather than silently omitted.
+## Status
+Computational work for the revised manuscript is complete. Wet-lab validation was not performed; it is proposed in the paper only as future work.
 
 ## License
-This repository is released under the [MIT License](LICENSE). The dataset accessions referenced above are governed by their respective sources' own terms of use.
+This repository is released under the [MIT License](LICENSE). The datasets referenced above are governed by their respective sources' terms of use.
