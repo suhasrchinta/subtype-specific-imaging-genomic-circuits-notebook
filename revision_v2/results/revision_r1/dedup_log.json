@@ -1,0 +1,52 @@
+{
+ "GSE20194_arrays_total": 278,
+ "GSE20194_MAQC_T_V": 230,
+ "GSE20194_MDA_R_replicates": 29,
+ "GSE20194_MAQC_Q_not_used": 19,
+ "GSE20194_MAQC_dup_by_expression": 186,
+ "GSE20194_MAQC_dup_by_identifier": 182,
+ "GSE20194_MAQC_dup_either": 187,
+ "GSE20194_MAQC_id_and_expr_agree": 181,
+ "GSE20194_MAQC_independent": 43,
+ "GSE20194_MAQC_by_subtype_dup": {
+  "false": {
+   "HER2+": 38,
+   "HR+/HER2-": 5,
+   "TNBC": 0
+  },
+  "true": {
+   "HER2+": 2,
+   "HR+/HER2-": 128,
+   "TNBC": 57
+  }
+ },
+ "GSE32646_max_rho_vs_GSE25066": 0.7948,
+ "GSE32646_max_rho_vs_GSE20194": 0.8044,
+ "GSE32646_probes": {
+  "SCUBE2": [
+   "219197_s_at"
+  ],
+  "ERBB2": [
+   "210930_s_at",
+   "216836_s_at",
+   "234354_x_at"
+  ],
+  "GRB7": [
+   "210761_s_at"
+  ],
+  "FLT1": [
+   "204406_at",
+   "210287_s_at",
+   "222033_s_at",
+   "226497_s_at",
+   "226498_at",
+   "232809_s_at"
+  ],
+  "ANGPT2": [
+   "205572_at",
+   "211148_s_at",
+   "236034_at",
+   "237261_at"
+  ]
+ }
+}

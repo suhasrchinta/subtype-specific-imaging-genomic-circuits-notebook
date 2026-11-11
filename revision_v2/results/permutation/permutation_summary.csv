@@ -1,0 +1,3 @@
+cohort,observed_auc,n_permutations,n_ge_observed,p
+Pooled,0.798599,1000,0,0.000999000999000999
+HER2+,0.726194,1000,1,0.001998001998001998
